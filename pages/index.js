@@ -27,6 +27,23 @@ const formatTime = ms => {
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 
+const Footer = () => (
+  <div className="footer">
+    Built with 💖 using{' '}
+    <a href="https://nextjs.org/" target="_blank" rel="noopener">
+      Next.js
+    </a>
+    , code on{' '}
+    <a
+      href="https://github.com/RaedsLab/islistening"
+      target="_blank"
+      rel="noopener"
+    >
+      Github
+    </a>
+  </div>
+)
+
 const Home = props => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [isError, setIsError] = React.useState(props.isError)
@@ -92,23 +109,19 @@ const Home = props => {
 
   if (isError) {
     return (
-      <div>
-        <div className="container">
-          <div className="laoding">
-            <h1>Sorry</h1>
-            I'm not currently listening to music, come back a bit later or visit
-            my <a href="https://github.com/RaedsLab">Github</a>.
-          </div>
+      <div className="container">
+        <div className="laoding">
+          <h1>Sorry</h1>
+          I'm not currently listening to music, come back a bit later or visit
+          my <a href="https://github.com/RaedsLab">Github</a>.
         </div>
       </div>
     )
   }
   if (!song) {
     return (
-      <div>
-        <div className="container">
-          <div className="laoding">Loading</div>
-        </div>
+      <div className="container">
+        <div className="laoding">Loading...</div>
       </div>
     )
   }
@@ -126,8 +139,8 @@ const Home = props => {
       <div className="container">
         <h1 className="heading">I'm currently listening to</h1>
         <div className="title">
-          I'm currently listening to
           <div className="live" />
+          I'm currently listening to
         </div>
         <div className="image-container">
           <a href={song.url} target="_blank" rel="noopener">
@@ -146,6 +159,7 @@ const Home = props => {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
       <div
         className="background"

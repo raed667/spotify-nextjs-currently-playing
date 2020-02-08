@@ -1,10 +1,10 @@
 # Currently Listening on Spotify
 
-> Now Playing using Next.js + Spotify
+[Demo](https://spotify.raed.dev/)
+
+> Now Playing App using Next.js + Spotify
 
 ![screenshot](https://i.imgur.com/6jqKCgx.png?1)
-
-[Demo](https://spotify.raed.dev/)
 
 ## Build Setup
 
