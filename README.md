@@ -2,6 +2,8 @@
 
 > Now Playing using Next.js + Spotify
 
+![screenshot](https://i.imgur.com/6jqKCgx.png?1)
+
 [Demo](https://spotify.raed.dev/)
 
 ## Build Setup
