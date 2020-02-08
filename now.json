@@ -1,0 +1,11 @@
+{
+    "env": {
+        "AUTHORIZED_USER_ID": "@authorized_user_id",
+        "CLIENT_ID": "@client_id",
+        "CLIENT_SECRET": "@client_secret",
+        "REDIRECT_URI": "@redirect_uri",
+        "REDIS_PORT": "@redis_port",
+        "REDIS_HOST": "@redis_host",
+        "REDIS_PASSWORD": "@redis_password"
+    }
+}

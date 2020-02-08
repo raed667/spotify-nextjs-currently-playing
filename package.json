@@ -1,0 +1,34 @@
+{
+  "name": "spotify-playing-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@zeit/next-sass": "^1.0.1",
+    "dotenv-load": "^2.0.0",
+    "isomorphic-unfetch": "^3.0.0",
+    "next": "9.1.6",
+    "next-env": "^1.1.0",
+    "next-offline": "^4.0.6",
+    "node-fetch": "^2.6.0",
+    "node-sass": "^4.13.0",
+    "querystring": "^0.2.0",
+    "react": "16.12.0",
+    "react-dom": "16.12.0",
+    "redis": "^2.8.0",
+    "spotify-web-api-node": "^4.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.17.0",
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "prettier": "1.19.1"
+  }
+}
