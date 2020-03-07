@@ -861,11 +861,18 @@ export default async (req, res) => {
   try {
     res.setHeader('Content-Type', 'application/json')
     const data = await getData(access_token)
+    if (data === null) {
+      redis_song.isPlaying = false
+      res.status(200).json(redis_song)
+      return
+    }
+
     res.status(200).json(data)
   } catch (err) {
     try {
       await refreshToken()
       const data = await getData(access_token)
+      console.log('DATA 2')
       res.status(200).json(data)
     } catch (err) {
       res.status(500).json({ error: err.message })

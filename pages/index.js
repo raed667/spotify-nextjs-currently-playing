@@ -85,7 +85,8 @@ const Home = props => {
   }, [])
 
   useInterval(() => {
-    if (song && progressMs < song.duration_ms) setProgressMs(progressMs + 100)
+    if (song && song.isPlaying && progressMs < song.duration_ms)
+      setProgressMs(progressMs + 100)
   }, 100)
 
   React.useEffect(() => {
@@ -139,7 +140,7 @@ const Home = props => {
       <div className="container">
         <h1 className="heading">I'm currently listening to</h1>
         <div className="title">
-          <div className="live" />
+          {song.isPlaying && <div className="live" />}
           I'm currently listening to
         </div>
         <div className="image-container">
@@ -149,14 +150,18 @@ const Home = props => {
           <div className="info">
             <div className="name">{song.name}</div>
             <div className="artist">{song.artist}</div>
-
-            <div className="progress-container">
-              <div style={{ width: `${progress}%` }} className="progress"></div>
-              <div className="timer">
-                <div>{formatTime(progressMs)}</div>
-                <div>{formatTime(song.duration_ms)}</div>
+            {song.isPlaying && (
+              <div className="progress-container">
+                <div
+                  style={{ width: `${progress}%` }}
+                  className="progress"
+                ></div>
+                <div className="timer">
+                  <div>{formatTime(progressMs)}</div>
+                  <div>{formatTime(song.duration_ms)}</div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         <Footer />
@@ -182,6 +187,10 @@ Home.getInitialProps = async ({ req }) => {
         song: data,
         progressMs: time_diff + data.progress_ms,
       }
+    }
+    return {
+      song: data,
+      progressMs: 0,
     }
   } catch (err) {
     return { isLoading: false, isError: true }
