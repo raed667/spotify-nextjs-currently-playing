@@ -14,7 +14,7 @@
     "lodash.memoize": "^4.1.2",
     "next": "9.1.6",
     "next-env": "^1.1.0",
-    "next-offline": "^4.0.6",
+    "next-offline": "^5.0.0",
     "node-fetch": "^2.6.0",
     "node-sass": "^4.13.0",
     "node-vibrant": "^3.1.5",
