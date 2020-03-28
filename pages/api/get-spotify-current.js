@@ -2,6 +2,7 @@ const SpotifyWebApi = require('spotify-web-api-node')
 const redis = require('redis')
 const { promisify } = require('util')
 const fetch = require('node-fetch')
+import * as Vibrant from 'node-vibrant'
 
 const {
   CLIENT_ID,
@@ -84,7 +85,12 @@ const getData = async access_token => {
   if (response.status === 200) {
     const data = await response.json()
     const song = extract(data)
-
+    try {
+      const palette = await Vibrant.from(song.image).getPalette()
+      song.backgroundColor = palette.Vibrant.getHex()
+    } catch (err) {
+      console.error(err)
+    }
     redisClient.set('last_song', JSON.stringify(song), redis.print)
     return song
   }

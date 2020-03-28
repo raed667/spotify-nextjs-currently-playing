@@ -3,10 +3,21 @@ import Head from 'next/head'
 import './index.scss'
 import { useInterval } from '../util/hooks'
 import fetch from 'isomorphic-unfetch'
+import memoize from 'lodash.memoize'
 
 const { GOOGLE_ANALYTICS_CODE } = process.env
 
-const idToColor = id => {
+const hexToRgba = memoize(hex => {
+  if (!hex) return null
+
+  const bigint = parseInt(hex, 16)
+  const r = (bigint >> 16) & 255
+  const g = (bigint >> 8) & 255
+  const b = bigint & 255
+  return `rgb(${r}, ${g}, ${b}, 0.2)`
+})
+
+const idToColor = memoize(id => {
   var hash = 0
   if (id.length === 0) return hash
   for (var i = 0; i < id.length; i++) {
@@ -19,7 +30,7 @@ const idToColor = id => {
     rgb[i] = value
   }
   return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.2)`
-}
+})
 
 const formatTime = ms => {
   var minutes = Math.floor(ms / 60000)
@@ -168,7 +179,10 @@ const Home = props => {
       </div>
       <div
         className="background"
-        style={{ backgroundColor: idToColor(song.id) }}
+        style={{
+          backgroundColor:
+            hexToRgba(song.backgroundColor) || idToColor(song.id),
+        }}
       ></div>
     </div>
   )
