@@ -9,7 +9,12 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
-        <Head />
+        <Head>
+          <meta
+            name="Description"
+            content="Show what music Raed is listening to on Spotify."
+          />
+        </Head>
         <body>
           <Main />
           <NextScript />
