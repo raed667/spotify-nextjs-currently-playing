@@ -8,20 +8,19 @@
     "start": "next start"
   },
   "dependencies": {
-    "@zeit/next-sass": "^1.0.1",
     "dotenv-load": "^2.0.0",
     "isomorphic-unfetch": "^3.0.0",
     "lodash.memoize": "^4.1.2",
-    "next": "9.3.2",
+    "next": "9.3.4",
     "next-env": "^1.1.0",
     "next-offline": "^5.0.0",
     "node-fetch": "^2.6.0",
     "node-sass": "^4.13.0",
     "node-vibrant": "^3.1.5",
     "querystring": "^0.2.0",
-    "react": "16.12.0",
-    "react-dom": "16.12.0",
-    "redis": "^2.8.0",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "redis": "^3.0.2",
     "spotify-web-api-node": "^4.0.0"
   },
   "devDependencies": {
@@ -36,8 +35,8 @@
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.17.0",
-    "eslint-plugin-react-hooks": "^1.7.0",
-    "prettier": "1.19.1",
+    "eslint-plugin-react-hooks": "^3.0.0",
+    "prettier": "2.0.2",
     "typescript": "^3.8.3"
   }
 }

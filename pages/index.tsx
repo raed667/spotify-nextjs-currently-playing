@@ -5,7 +5,6 @@ import fetch from 'isomorphic-unfetch'
 import memoize from 'lodash.memoize'
 
 import { useInterval } from '../util/hooks'
-import './styles/index.scss'
 
 const { GOOGLE_ANALYTICS_CODE } = process.env
 
@@ -19,7 +18,7 @@ const hexToRgba = memoize((hex: string) => {
   return `rgb(${r}, ${g}, ${b}, 0.2)`
 })
 
-const idToColor = memoize(id => {
+const idToColor = memoize((id) => {
   let hash = 0
   if (id.length === 0) return '#FFF'
   for (let i = 0; i < id.length; i++) {

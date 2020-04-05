@@ -1,9 +1,8 @@
 const withOffline = require('next-offline')
 const nextEnv = require('next-env')
 const dotenvLoad = require('dotenv-load')
-const withSass = require('@zeit/next-sass')
 
 dotenvLoad()
 const withNextEnv = nextEnv({})
 
-module.exports = withNextEnv(withOffline(withSass({})))
+module.exports = withNextEnv(withOffline({}))

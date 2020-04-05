@@ -1,8 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
 
-import './styles/login.scss'
-
 type State = {
   loginUrl: string
   loading: boolean
@@ -20,8 +18,8 @@ const Login = () => {
     setState({ ...state, error: null, loading: true })
 
     const url = await fetch('/api/get-spotify-login-url')
-      .then(response => response.json())
-      .then(json => json.spotify_uri)
+      .then((response) => response.json())
+      .then((json) => json.spotify_uri)
 
     setState({ ...state, error: null, loading: false })
 
@@ -30,10 +28,10 @@ const Login = () => {
 
   React.useEffect(() => {
     getSpotifyLoginURL()
-      .then(loginUrl => {
+      .then((loginUrl) => {
         setState({ ...state, loginUrl })
       })
-      .catch(error => {
+      .catch((error) => {
         setState({ ...state, error })
       })
   }, [])
@@ -50,12 +48,12 @@ const Login = () => {
 
   // Main
   return (
-    <div className="root">
+    <div className="login">
       {state.loading ? (
         <p>Loading...</p>
       ) : (
         <Link href={state.loginUrl}>
-          <a className="link">LOG IN</a>
+          <a className="loginLink">LOG IN</a>
         </Link>
       )}
     </div>
