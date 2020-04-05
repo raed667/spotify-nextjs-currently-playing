@@ -1,6 +1,6 @@
 import React from 'react'
 
-const saveSpotifyCode = code => {
+const saveSpotifyCode = (code: string) => {
   return fetch('/api/save-spotify-code', {
     method: 'POST',
     headers: {
@@ -10,8 +10,13 @@ const saveSpotifyCode = code => {
   })
 }
 
+type State = {
+  loading: boolean
+  error: string | null
+}
+
 const Callback = () => {
-  const [state, setState] = React.useState({
+  const [state, setState] = React.useState<State>({
     loading: true,
     error: null,
   })
@@ -23,7 +28,7 @@ const Callback = () => {
       setState({ loading: false, error: 'Can not find code in response' })
     } else {
       saveSpotifyCode(code)
-        .then(() => setState({ loading: false, error: false }))
+        .then(() => setState({ loading: false, error: null }))
         .catch(err => setState({ loading: false, error: err }))
     }
   }, [])

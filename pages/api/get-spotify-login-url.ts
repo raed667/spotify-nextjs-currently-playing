@@ -1,4 +1,6 @@
-const querystring = require('querystring')
+import { NextApiRequest, NextApiResponse } from 'next'
+import querystring from 'querystring'
+
 const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = process.env
 
 const scopes = [
@@ -18,7 +20,7 @@ const spotify_uri =
     redirect_uri: REDIRECT_URI,
   })
 
-export default (req, res) => {
+export default (_: NextApiRequest, res: NextApiResponse) => {
   res.setHeader('Content-Type', 'application/json')
   res.status(200).json({ spotify_uri })
 }

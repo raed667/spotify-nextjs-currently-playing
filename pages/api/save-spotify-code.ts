@@ -1,5 +1,6 @@
-const SpotifyWebApi = require('spotify-web-api-node')
-const redis = require('redis')
+import { NextApiRequest, NextApiResponse } from 'next'
+import SpotifyWebApi from 'spotify-web-api-node'
+import redis from 'redis'
 
 const {
   CLIENT_ID,
@@ -19,18 +20,12 @@ const credentials = {
 const spotifyApi = new SpotifyWebApi(credentials)
 
 const redisClient = redis.createClient({
-  port: REDIS_PORT,
+  port: Number(REDIS_PORT),
   host: REDIS_HOST,
   password: REDIS_PASSWORD,
 })
 
-redisClient.on('error', function(err) {
-  console.log('Redis Error ' + err)
-})
-
-const getToken = code => {}
-
-export default (req, res) => {
+export default (req: NextApiRequest, res: NextApiResponse) => {
   res.setHeader('Content-Type', 'application/json')
   if (req.method !== 'POST') {
     return res.status(404).json({ success: false })
@@ -45,7 +40,6 @@ export default (req, res) => {
   spotifyApi.authorizationCodeGrant(code).then(
     data => {
       // Set the access token on the API object to use it in later calls
-      const expires_in = data.body['expires_in']
       const access_token = data.body['access_token']
       const refresh_token = data.body['refresh_token']
       spotifyApi.setAccessToken(access_token)

@@ -1,15 +1,16 @@
+import { NextPageContext } from 'next'
 import React from 'react'
 import Head from 'next/head'
 import fetch from 'isomorphic-unfetch'
 import memoize from 'lodash.memoize'
 
 import { useInterval } from '../util/hooks'
-import './index.scss'
+import './styles/index.scss'
 
 const { GOOGLE_ANALYTICS_CODE } = process.env
 
-const hexToRgba = memoize(hex => {
-  if (!hex) return null
+const hexToRgba = memoize((hex: string) => {
+  if (!hex) return '#FFF'
 
   const bigint = parseInt(hex, 16)
   const r = (bigint >> 16) & 255
@@ -19,21 +20,20 @@ const hexToRgba = memoize(hex => {
 })
 
 const idToColor = memoize(id => {
-  var hash = 0
-  if (id.length === 0) return hash
-  for (var i = 0; i < id.length; i++) {
+  let hash = 0
+  if (id.length === 0) return '#FFF'
+  for (let i = 0; i < id.length; i++) {
     hash = id.charCodeAt(i) + ((hash << 5) - hash)
     hash = hash & hash
   }
-  var rgb = [0, 0, 0]
-  for (var i = 0; i < 3; i++) {
-    var value = (hash >> (i * 8)) & 255
-    rgb[i] = value
+  const rgb = [0, 0, 0]
+  for (let i = 0; i < 3; i++) {
+    rgb[i] = (hash >> (i * 8)) & 255
   }
   return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.2)`
 })
 
-const formatTime = ms => {
+const formatTime = (ms: number) => {
   var minutes = Math.floor(ms / 60000)
   var seconds = Number(((ms % 60000) / 1000).toFixed(0))
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
@@ -56,7 +56,13 @@ const Footer = () => (
   </div>
 )
 
-const Home = props => {
+type Props = {
+  song: any // @TODO
+  isError: boolean
+  progressMs: number
+}
+
+const Home = (props: Props) => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [isError, setIsError] = React.useState(props.isError)
 
@@ -71,8 +77,8 @@ const Home = props => {
       const data = await res.json()
 
       if (data.isPlaying) {
-        // @ts-ignore
-        const time_diff = new Date() - new Date(data.timestamp)
+        const time_diff =
+          new Date().getTime() - new Date(data.timestamp).getTime()
         return {
           error: false,
           song: data,
@@ -91,7 +97,9 @@ const Home = props => {
       // @ts-ignore
       dataLayer.push(arguments)
     }
+    // @ts-ignore
     gtag('js', new Date())
+    // @ts-ignore
     gtag('config', GOOGLE_ANALYTICS_CODE, {
       page_location: window.location.href,
       page_path: window.location.pathname,
@@ -112,9 +120,11 @@ const Home = props => {
       setIsError(false)
       setIsLoading(true)
       const data = await getPlayingSong()
-      setIsError(data.error)
-      setSong(data.song)
-      setProgressMs(data.progressMs)
+      if (data) {
+        setIsError(data.error)
+        setSong(data.song)
+        setProgressMs(data.progressMs)
+      }
       setIsLoading(false)
     }
 
@@ -184,7 +194,6 @@ const Home = props => {
       <div
         className="background"
         style={{
-          // @ts-ignore
           backgroundColor:
             hexToRgba(song.backgroundColor) || idToColor(song.id),
         }}
@@ -193,16 +202,16 @@ const Home = props => {
   )
 }
 
-Home.getInitialProps = async ({ req }) => {
+Home.getInitialProps = async ({ req }: NextPageContext) => {
   try {
-    const protocol = req.headers['x-forwarded-proto'] || 'http'
+    const protocol = req ? req.headers['x-forwarded-proto'] || 'http' : 'http'
     const baseUrl = req ? `${protocol}://${req.headers.host}` : ''
     const res = await fetch(baseUrl + '/api/get-spotify-current')
     const data = await res.json()
 
     if (data.isPlaying) {
-      // @ts-ignore
-      const time_diff = new Date() - new Date(data.timestamp)
+      const time_diff =
+        new Date().getTime() - new Date(data.timestamp).getTime()
       return {
         song: data,
         progressMs: time_diff + data.progress_ms,

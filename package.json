@@ -25,12 +25,19 @@
     "spotify-web-api-node": "^4.0.0"
   },
   "devDependencies": {
+    "@types/lodash.memoize": "^4.1.6",
+    "@types/node": "^13.11.0",
+    "@types/node-fetch": "^2.5.5",
+    "@types/react": "^16.9.32",
+    "@types/redis": "^2.8.17",
+    "@types/spotify-web-api-node": "^4.0.1",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.17.0",
     "eslint-plugin-react-hooks": "^1.7.0",
-    "prettier": "1.19.1"
+    "prettier": "1.19.1",
+    "typescript": "^3.8.3"
   }
 }

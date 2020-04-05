@@ -1,14 +1,38 @@
-const SpotifyWebApi = require('spotify-web-api-node')
-const redis = require('redis')
-const { promisify } = require('util')
-const fetch = require('node-fetch')
-const Vibrant = require('node-vibrant')
+import { NextApiRequest, NextApiResponse } from 'next'
+import SpotifyWebApi from 'spotify-web-api-node'
+import redis from 'redis'
+import { promisify } from 'util'
+import fetch from 'node-fetch'
+import Vibrant from 'node-vibrant'
+
+type Artist = {
+  name: string
+}
+
+type RawSong = {
+  currently_playing_type: string
+  progress_ms: number
+  item: {
+    id: string
+    name: string
+    duration_ms: number
+    external_urls: {
+      spotify: string
+    }
+    preview_url: string
+    artists: Artist[]
+    album: {
+      images: {
+        url: string
+      }[]
+    }
+  }
+}
 
 const {
   CLIENT_ID,
   CLIENT_SECRET,
   REDIRECT_URI,
-  AUTHORIZED_USER_ID,
   REDIS_PASSWORD,
   REDIS_PORT,
   REDIS_HOST,
@@ -28,44 +52,34 @@ const redisClient = redis.createClient({
 })
 const getAsync = promisify(redisClient.get).bind(redisClient)
 
-redisClient.on('error', function(err) {
-  console.log('Redis Error ' + err)
-})
-
-const extract = raw => {
-  if (raw.currently_playing_type === 'track') {
-    return { ...extractSong(raw), isPlaying: true }
+const extract = (raw: RawSong) => {
+  if (raw.currently_playing_type !== 'track') {
+    throw new Error('Not playing')
   }
 
-  throw new Error('Not playing')
+  return { ...extractSong(raw), isPlaying: true }
 }
 
-const extractSong = raw => {
-  try {
-    const timestamp = Date.now()
-    const expire_at = new Date(
-      timestamp + raw.item.duration_ms - raw.progress_ms
-    )
+const extractSong = (raw: RawSong) => {
+  const timestamp = Date.now()
+  const expire_at = new Date(timestamp + raw.item.duration_ms - raw.progress_ms)
 
-    return {
-      id: raw.item.id,
-      name: raw.item.name,
-      progress_ms: raw.progress_ms,
-      duration_ms: raw.item.duration_ms,
-      url: raw.item.external_urls.spotify,
-      preview_url: raw.item.preview_url,
-      artist: raw.item.artists[0].name,
-      image: raw.item.album.images[0].url,
-      expire_at,
-      timestamp,
-      backgroundColor: '#FFF',
-    }
-  } catch (err) {
-    return null
+  return {
+    id: raw.item.id,
+    name: raw.item.name,
+    progress_ms: raw.progress_ms,
+    duration_ms: raw.item.duration_ms,
+    url: raw.item.external_urls.spotify,
+    preview_url: raw.item.preview_url,
+    artist: raw.item.artists[0].name,
+    image: raw.item.album.images[0].url,
+    expire_at,
+    timestamp,
+    backgroundColor: '#FFF',
   }
 }
 
-const getData = async access_token => {
+const getData = async (access_token: string) => {
   const fetchOptions = {
     method: 'GET',
     headers: {
@@ -75,7 +89,6 @@ const getData = async access_token => {
     },
   }
 
-  // @ts-ignore
   const response = await fetch(
     'https://api.spotify.com/v1/me/player/currently-playing',
     fetchOptions
@@ -89,7 +102,8 @@ const getData = async access_token => {
     const song = extract(data)
     try {
       const palette = await Vibrant.from(song.image).getPalette()
-      song.backgroundColor = palette.Vibrant.getHex()
+      song.backgroundColor =
+        (palette.Vibrant && palette.Vibrant.getHex()) || '#FFF'
     } catch (err) {
       console.error(err)
     }
@@ -100,7 +114,7 @@ const getData = async access_token => {
   return null
 }
 
-export default async (req, res) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   let access_token = await getAsync('access_token')
   const refresh_token = await getAsync('refresh_token')
 

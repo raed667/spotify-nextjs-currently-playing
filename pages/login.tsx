@@ -1,10 +1,16 @@
 import React from 'react'
 import Link from 'next/link'
 
-import './login.scss'
+import './styles/login.scss'
+
+type State = {
+  loginUrl: string
+  loading: boolean
+  error: string | null
+}
 
 const Login = () => {
-  const [state, setState] = React.useState({
+  const [state, setState] = React.useState<State>({
     loginUrl: '',
     loading: false,
     error: null,
