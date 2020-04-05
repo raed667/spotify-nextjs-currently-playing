@@ -1,9 +1,10 @@
 import React from 'react'
 import Head from 'next/head'
-import './index.scss'
-import { useInterval } from '../util/hooks'
 import fetch from 'isomorphic-unfetch'
 import memoize from 'lodash.memoize'
+
+import { useInterval } from '../util/hooks'
+import './index.scss'
 
 const { GOOGLE_ANALYTICS_CODE } = process.env
 
@@ -34,7 +35,7 @@ const idToColor = memoize(id => {
 
 const formatTime = ms => {
   var minutes = Math.floor(ms / 60000)
-  var seconds = ((ms % 60000) / 1000).toFixed(0)
+  var seconds = Number(((ms % 60000) / 1000).toFixed(0))
   return minutes + ':' + (seconds < 10 ? '0' : '') + seconds
 }
 
@@ -70,6 +71,7 @@ const Home = props => {
       const data = await res.json()
 
       if (data.isPlaying) {
+        // @ts-ignore
         const time_diff = new Date() - new Date(data.timestamp)
         return {
           error: false,
@@ -83,8 +85,10 @@ const Home = props => {
   }
 
   React.useEffect(() => {
+    // @ts-ignore
     window.dataLayer = window.dataLayer || []
     function gtag() {
+      // @ts-ignore
       dataLayer.push(arguments)
     }
     gtag('js', new Date())
@@ -140,7 +144,7 @@ const Home = props => {
   return (
     <div>
       <Head>
-        <title>What is Raed currently playing</title>
+        <title>What is Raed playing</title>
         <script
           async
           src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_CODE}`}
@@ -149,10 +153,10 @@ const Home = props => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div className="container">
-        <h1 className="heading">I'm currently listening to</h1>
+        <h1 className="heading">I'm listening to</h1>
         <div className="title">
           {song.isPlaying && <div className="live" />}
-          I'm currently listening to
+          I'm listening to
         </div>
         <div className="image-container">
           <a href={song.url} target="_blank" rel="noopener">
@@ -180,6 +184,7 @@ const Home = props => {
       <div
         className="background"
         style={{
+          // @ts-ignore
           backgroundColor:
             hexToRgba(song.backgroundColor) || idToColor(song.id),
         }}
@@ -196,6 +201,7 @@ Home.getInitialProps = async ({ req }) => {
     const data = await res.json()
 
     if (data.isPlaying) {
+      // @ts-ignore
       const time_diff = new Date() - new Date(data.timestamp)
       return {
         song: data,

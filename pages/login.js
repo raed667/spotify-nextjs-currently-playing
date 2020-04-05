@@ -1,26 +1,34 @@
 import React from 'react'
 import Link from 'next/link'
 
-const getSpotifyLoginURL = () => {
-  return fetch('/api/get-spotify-login-url')
-    .then(response => response.json())
-    .then(json => json.spotify_uri)
-}
+import './login.scss'
 
 const Login = () => {
   const [state, setState] = React.useState({
     loginUrl: '',
-    loading: true,
+    loading: false,
     error: null,
   })
+
+  const getSpotifyLoginURL = async () => {
+    setState({ ...state, error: null, loading: true })
+
+    const url = await fetch('/api/get-spotify-login-url')
+      .then(response => response.json())
+      .then(json => json.spotify_uri)
+
+    setState({ ...state, error: null, loading: false })
+
+    return url
+  }
 
   React.useEffect(() => {
     getSpotifyLoginURL()
       .then(loginUrl => {
         setState({ ...state, loginUrl })
       })
-      .catch(err => {
-        setState({ ...state, error: err })
+      .catch(error => {
+        setState({ ...state, error })
       })
   }, [])
 
@@ -34,16 +42,17 @@ const Login = () => {
     )
   }
 
-  // Loading
-  if (state.isLoading) {
-    return <p>Loading...</p>
-  }
-
   // Main
   return (
-    <Link href={state.loginUrl}>
-      <a>LOG IN</a>
-    </Link>
+    <div className="root">
+      {state.loading ? (
+        <p>Loading...</p>
+      ) : (
+        <Link href={state.loginUrl}>
+          <a className="link">LOG IN</a>
+        </Link>
+      )}
+    </div>
   )
 }
 

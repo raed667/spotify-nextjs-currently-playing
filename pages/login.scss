@@ -1,0 +1,27 @@
+.root {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.link {
+  background-color: #1db954;
+  box-shadow: 0 5px 0 #137736;
+  color: white;
+  padding: 1em 1.5em;
+  position: relative;
+  text-decoration: none;
+  text-transform: uppercase;
+
+  &:hover {
+    background-color: #0f612c;
+  }
+
+  &:active {
+    box-shadow: none;
+    top: 5px;
+  }
+}

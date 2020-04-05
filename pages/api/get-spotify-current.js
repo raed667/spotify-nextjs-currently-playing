@@ -2,7 +2,7 @@ const SpotifyWebApi = require('spotify-web-api-node')
 const redis = require('redis')
 const { promisify } = require('util')
 const fetch = require('node-fetch')
-import * as Vibrant from 'node-vibrant'
+const Vibrant = require('node-vibrant')
 
 const {
   CLIENT_ID,
@@ -22,7 +22,7 @@ const credentials = {
 const spotifyApi = new SpotifyWebApi(credentials)
 
 const redisClient = redis.createClient({
-  port: REDIS_PORT,
+  port: Number(REDIS_PORT),
   host: REDIS_HOST,
   password: REDIS_PASSWORD,
 })
@@ -37,7 +37,7 @@ const extract = raw => {
     return { ...extractSong(raw), isPlaying: true }
   }
 
-  return { isPlaying: false }
+  throw new Error('Not playing')
 }
 
 const extractSong = raw => {
@@ -58,6 +58,7 @@ const extractSong = raw => {
       image: raw.item.album.images[0].url,
       expire_at,
       timestamp,
+      backgroundColor: '#FFF',
     }
   } catch (err) {
     return null
@@ -74,6 +75,7 @@ const getData = async access_token => {
     },
   }
 
+  // @ts-ignore
   const response = await fetch(
     'https://api.spotify.com/v1/me/player/currently-playing',
     fetchOptions
