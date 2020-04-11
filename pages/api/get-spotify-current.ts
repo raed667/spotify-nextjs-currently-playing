@@ -5,29 +5,7 @@ import { promisify } from 'util'
 import fetch from 'node-fetch'
 import Vibrant from 'node-vibrant'
 
-type Artist = {
-  name: string
-}
-
-type RawSong = {
-  currently_playing_type: string
-  progress_ms: number
-  item: {
-    id: string
-    name: string
-    duration_ms: number
-    external_urls: {
-      spotify: string
-    }
-    preview_url: string
-    artists: Artist[]
-    album: {
-      images: {
-        url: string
-      }[]
-    }
-  }
-}
+import { RawSong } from '../../typings/song'
 
 const {
   CLIENT_ID,
@@ -38,12 +16,11 @@ const {
   REDIS_HOST,
 } = process.env
 
-const credentials = {
+const spotifyApi = new SpotifyWebApi({
   clientId: CLIENT_ID,
   clientSecret: CLIENT_SECRET,
   redirectUri: REDIRECT_URI,
-}
-const spotifyApi = new SpotifyWebApi(credentials)
+})
 
 const redisClient = redis.createClient({
   port: Number(REDIS_PORT),
@@ -56,7 +33,6 @@ const extract = (raw: RawSong) => {
   if (raw.currently_playing_type !== 'track') {
     throw new Error('Not playing')
   }
-
   return { ...extractSong(raw), isPlaying: true }
 }
 
@@ -100,13 +76,15 @@ const getData = async (access_token: string) => {
   if (response.status === 200) {
     const data = await response.json()
     const song = extract(data)
+
     try {
       const palette = await Vibrant.from(song.image).getPalette()
       song.backgroundColor =
         (palette.Vibrant && palette.Vibrant.getHex()) || '#FFF'
     } catch (err) {
-      console.error(err)
+      song.backgroundColor = '#FFF'
     }
+
     redisClient.set('last_song', JSON.stringify(song), redis.print)
     return song
   }
@@ -148,17 +126,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const data = await getData(access_token)
     if (data === null) {
       redis_song.isPlaying = false
-      res.status(200).json(redis_song)
-      return
+      return res.status(200).json(redis_song)
     }
-
-    res.status(200).json(data)
+    return res.status(200).json(data)
   } catch (err) {
     try {
       await refreshToken()
       const data = await getData(access_token)
-      console.log('DATA 2')
-      res.status(200).json(data)
+      if (data === null) {
+        redis_song.isPlaying = false
+        return res.status(200).json(redis_song)
+      }
+      return res.status(200).json(data)
     } catch (err) {
       res.status(500).json({ error: err.message })
     }
