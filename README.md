@@ -4,20 +4,15 @@
 
 > Now Playing App using Next.js + Spotify
 
-![screenshot](https://i.imgur.com/6jqKCgx.png?1)
 
 ## Build Setup
 
 ```bash
-# install dependencies
-$ yarn
-
-# run in devellopment mode
-$ yarn dev
+# install dependencies / run in devellopment mode
+$ yarn && yarn dev
 
 # build for production and launch server
-$ yarn build
-$ yarn start
+$ yarn && yarn build && yarn start
 ```
 
 Inspired by [cherscarlett/cherislistening](https://github.com/cherscarlett/cherislistening)
