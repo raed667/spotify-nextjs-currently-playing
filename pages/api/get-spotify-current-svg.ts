@@ -124,13 +124,16 @@ const formatResponse = async (res: NextApiResponse, song: any) => {
 
   res.setHeader('Content-Type', 'image/svg+xml')
   return res.status(200).send(
-    `<svg width="480" height="133" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <foreignObject width="480" height="133">
+    `<svg width="480" height="145" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <foreignObject width="480" height="145">
         <div xmlns="http://www.w3.org/1999/xhtml" class="container">
             <style>
                 .main {
-                    /*margin-top: 40px;*/
+                    padding-top: 16px;
+                    padding-bottom: 16px;
+                    background: #273849;
                     display: flex;
+                    border-radius: 4px;
                 }
                 .currentStatus {
                     float: left;
@@ -152,7 +155,7 @@ const formatResponse = async (res: NextApiResponse, song: any) => {
                     width: 71%;
                 }
                 .song {
-                    color: #666;
+                    color: #41b883;
                     overflow:hidden;
                     margin-top: 3px;
                     font-size: 24px;
@@ -161,7 +164,7 @@ const formatResponse = async (res: NextApiResponse, song: any) => {
                     text-overflow:ellipsis;
                 }
                 .artist {
-                    color: #b3b3b3;
+                    color: #E4E2E2;
                     font-size: 20px;
                     margin-top: 4px;
                     text-align: center;
@@ -202,7 +205,6 @@ const formatResponse = async (res: NextApiResponse, song: any) => {
                 }
                 ${barCSS}
             </style>
-            <!-- <div class="currentStatus">{{status}}</div> -->
             <div class="main">
                 <a class="art" href="${song.url}" target="_blank">
                     <center>
@@ -221,7 +223,7 @@ const formatResponse = async (res: NextApiResponse, song: any) => {
   )
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default async (_req: NextApiRequest, res: NextApiResponse) => {
   let access_token = (await getAsync('access_token')) || ''
   const refresh_token = (await getAsync('refresh_token')) || ''
   const redis_song_str = (await getAsync('last_song')) || ''
