@@ -93,10 +93,10 @@ const getData = async (access_token: string) => {
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  let access_token = await getAsync('access_token')
-  const refresh_token = await getAsync('refresh_token')
+  let access_token = (await getAsync('access_token')) || ''
+  const refresh_token = (await getAsync('refresh_token')) || ''
+  const redis_song_str = (await getAsync('last_song')) || ''
 
-  const redis_song_str = await getAsync('last_song')
   const redis_song = JSON.parse(redis_song_str)
 
   if (
