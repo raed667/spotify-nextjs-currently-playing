@@ -6,7 +6,6 @@ import fetch from 'node-fetch'
 import Vibrant from 'node-vibrant'
 
 import { RawSong } from '../../typings/song'
-const FileReader = require('filereader')
 
 const {
   CLIENT_ID,
