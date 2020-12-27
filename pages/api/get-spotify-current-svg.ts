@@ -6,6 +6,7 @@ import fetch from 'node-fetch'
 import Vibrant from 'node-vibrant'
 
 import { RawSong } from '../../typings/song'
+const FileReader = require('filereader')
 
 const {
   CLIENT_ID,
@@ -92,7 +93,7 @@ const getData = async (access_token: string) => {
   return null
 }
 
-const formatResponse = (res: NextApiResponse, song: any) => {
+const formatResponse = async (res: NextApiResponse, song: any) => {
   const barCount = 84
 
   const contentBar = new Array(barCount)
@@ -116,6 +117,10 @@ const formatResponse = (res: NextApiResponse, song: any) => {
   }
 
   const barCSS = barGen()
+
+  const imageB64 = await fetch(song.image)
+    .then((r) => r.buffer())
+    .then((r) => r.toString('base64'))
 
   res.setHeader('Content-Type', 'image/svg+xml')
   return res.status(200).send(
@@ -201,7 +206,7 @@ const formatResponse = (res: NextApiResponse, song: any) => {
             <div class="main">
                 <a class="art" href="${song.url}" target="_blank">
                     <center>
-                        <img src="${song.image}" class="cover" />
+                        <img src="data:image/jpeg;base64, ${imageB64}" class="cover" />
                     </center>
                 </a>
                 <div class="content">
