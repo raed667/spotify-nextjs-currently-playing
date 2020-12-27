@@ -228,7 +228,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     redis_song.expire_at &&
     new Date(redis_song.expire_at) > new Date()
   ) {
-    return res.status(200).json(redis_song)
+    return formatResponse(res, redis_song)
   }
 
   spotifyApi.setAccessToken(access_token)
