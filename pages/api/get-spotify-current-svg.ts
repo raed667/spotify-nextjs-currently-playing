@@ -246,7 +246,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    res.setHeader('Content-Type', 'application/json')
     const data = await getData(access_token)
     if (data === null) {
       redis_song.isPlaying = false
@@ -263,6 +262,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
       return formatResponse(res, data)
     } catch (err) {
+      res.setHeader('Content-Type', 'application/json')
       res.status(500).json({ error: err.message })
     }
   }
