@@ -123,8 +123,8 @@ const formatResponse = async (res: NextApiResponse, song: any) => {
 
   res.setHeader('Content-Type', 'image/svg+xml')
   return res.status(200).send(
-    `<svg width="480" height="145" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <foreignObject width="480" height="145">
+    `<svg width="480" height="195" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <foreignObject width="480" height="195">
         <div xmlns="http://www.w3.org/1999/xhtml" class="container">
             <style>
                 .main {
@@ -132,7 +132,7 @@ const formatResponse = async (res: NextApiResponse, song: any) => {
                     padding-bottom: 16px;
                     background: #273849;
                     display: flex;
-                    border-radius: 4px;
+                    border-radius: 6px;
                 }
                 .currentStatus {
                     float: left;
@@ -177,7 +177,7 @@ const formatResponse = async (res: NextApiResponse, song: any) => {
                 #bars {
                     width: 40px;
                     height: 30px;
-                    bottom: 23px;
+                    bottom: 80px;
                     position: absolute;
                     margin: -20px 0 0 0px;
                 }
