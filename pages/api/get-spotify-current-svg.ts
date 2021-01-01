@@ -5,7 +5,8 @@ import { promisify } from 'util'
 import fetch from 'node-fetch'
 import Vibrant from 'node-vibrant'
 
-import { RawSong } from '../../typings/song'
+import { RawSong, Song } from '../../typings/song'
+import { getCurrentSong } from './get-spotify-current'
 
 const {
   CLIENT_ID,
@@ -92,7 +93,7 @@ const getData = async (access_token: string) => {
   return null
 }
 
-const formatResponse = async (res: NextApiResponse, song: any) => {
+const formatResponse = async (song: Song) => {
   const barCount = 84
 
   const contentBar = new Array(barCount)
@@ -100,7 +101,7 @@ const formatResponse = async (res: NextApiResponse, song: any) => {
     .join('')
 
   const barGen = () => {
-    function randint(min: number, max: number) {
+    const randomInt = (min: number, max: number) => {
       min = Math.ceil(min)
       max = Math.floor(max)
       return Math.floor(Math.random() * (max - min + 1)) + min
@@ -108,7 +109,7 @@ const formatResponse = async (res: NextApiResponse, song: any) => {
     let barCSS = ''
     let left = 1
     for (let index = 1; index < barCount + 1; index++) {
-      const anim = randint(1000, 1350)
+      const anim = randomInt(1000, 1350)
       barCSS += `.bar:nth-child(${index})  { left: ${left}px; animation-duration: ${anim}ms; }`
       left += 4
     }
@@ -121,9 +122,7 @@ const formatResponse = async (res: NextApiResponse, song: any) => {
     .then((r) => r.buffer())
     .then((r) => r.toString('base64'))
 
-  res.setHeader('Content-Type', 'image/svg+xml')
-  return res.status(200).send(
-    `<svg width="480" height="195" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  return `<svg width="480" height="195" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <foreignObject width="480" height="195">
         <div xmlns="http://www.w3.org/1999/xhtml" class="container">
             <style>
@@ -219,57 +218,20 @@ const formatResponse = async (res: NextApiResponse, song: any) => {
         </div>
     </foreignObject>
 </svg>`
-  )
 }
 
 export default async (_req: NextApiRequest, res: NextApiResponse) => {
-  let access_token = (await getAsync('access_token')) || ''
-  const refresh_token = (await getAsync('refresh_token')) || ''
-  const redis_song_str = (await getAsync('last_song')) || ''
-
-  const redis_song = JSON.parse(redis_song_str)
-
-  if (
-    redis_song &&
-    redis_song.expire_at &&
-    new Date(redis_song.expire_at) > new Date()
-  ) {
-    return formatResponse(res, redis_song)
-  }
-
-  spotifyApi.setAccessToken(access_token)
-  spotifyApi.setRefreshToken(refresh_token)
-
-  const refreshToken = async () => {
-    try {
-      const data = await spotifyApi.refreshAccessToken()
-      access_token = data.body['access_token']
-      spotifyApi.setAccessToken(access_token)
-      redisClient.set('access_token', access_token, redis.print)
-    } catch (err) {
-      throw new Error('refreshToken: error setting refresh token')
-    }
-  }
-
   try {
-    const data = await getData(access_token)
-    if (data === null) {
-      redis_song.isPlaying = false
-      return formatResponse(res, redis_song)
+    const song = await getCurrentSong()
+    if (!song) {
+      throw new Error('Cached song not found')
     }
-    return formatResponse(res, data)
-  } catch (err) {
-    try {
-      await refreshToken()
-      const data = await getData(access_token)
-      if (data === null) {
-        redis_song.isPlaying = false
-        return formatResponse(res, redis_song)
-      }
-      return formatResponse(res, data)
-    } catch (err) {
-      res.setHeader('Content-Type', 'application/json')
-      res.status(500).json({ error: err.message })
-    }
+    const svg = await formatResponse(song)
+    res.setHeader('Content-Type', 'image/svg+xml')
+    return res.status(200).send(svg)
+  } catch (error) {
+    console.log(error)
+    res.setHeader('Content-Type', 'application/json')
+    res.status(500).json({ error: error.message })
   }
 }

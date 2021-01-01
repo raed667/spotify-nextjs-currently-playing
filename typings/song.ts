@@ -19,3 +19,18 @@ export type RawSong = {
     }
   }
 }
+
+export type Song = {
+  id: string
+  name: string
+  progress_ms: number
+  duration_ms: number
+  url: string
+  preview_url: string
+  artist: string
+  image: string
+  expire_at: Date
+  timestamp: number
+  backgroundColor: string
+  isPlaying: boolean
+}

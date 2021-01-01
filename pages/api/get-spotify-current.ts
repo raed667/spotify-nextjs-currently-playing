@@ -5,7 +5,8 @@ import { promisify } from 'util'
 import fetch from 'node-fetch'
 import Vibrant from 'node-vibrant'
 
-import { RawSong } from '../../typings/song'
+import { RawSong, Song } from '../../typings/song'
+import { idToColor } from '../../util/helpers'
 
 const {
   CLIENT_ID,
@@ -29,14 +30,14 @@ const redisClient = redis.createClient({
 })
 const getAsync = promisify(redisClient.get).bind(redisClient)
 
-const extract = (raw: RawSong) => {
+const extract = (raw: RawSong): Song => {
   if (raw.currently_playing_type !== 'track') {
     throw new Error('Not playing')
   }
   return { ...extractSong(raw), isPlaying: true }
 }
 
-const extractSong = (raw: RawSong) => {
+const extractSong = (raw: RawSong): Song => {
   const timestamp = Date.now()
   const expire_at = new Date(timestamp + raw.item.duration_ms - raw.progress_ms)
 
@@ -51,11 +52,12 @@ const extractSong = (raw: RawSong) => {
     image: raw.item.album.images[0].url,
     expire_at,
     timestamp,
-    backgroundColor: '#FFF',
+    backgroundColor: idToColor(raw.item.id),
+    isPlaying: false,
   }
 }
 
-const getData = async (access_token: string) => {
+const getData = async (access_token: string): Promise<Song | null> => {
   const fetchOptions = {
     method: 'GET',
     headers: {
@@ -79,10 +81,9 @@ const getData = async (access_token: string) => {
 
     try {
       const palette = await Vibrant.from(song.image).getPalette()
-      song.backgroundColor =
-        (palette.Vibrant && palette.Vibrant.getHex()) || '#FFF'
+      song.backgroundColor = palette?.Vibrant?.getHex() || idToColor(song.id)
     } catch (err) {
-      song.backgroundColor = '#FFF'
+      song.backgroundColor = idToColor(song.id)
     }
 
     redisClient.set('last_song', JSON.stringify(song), redis.print)
@@ -92,54 +93,88 @@ const getData = async (access_token: string) => {
   return null
 }
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  let access_token = (await getAsync('access_token')) || ''
-  const refresh_token = (await getAsync('refresh_token')) || ''
-  const redis_song_str = (await getAsync('last_song')) || ''
+const refreshToken = async () => {
+  try {
+    const data = await spotifyApi.refreshAccessToken()
+    const access_token = data.body['access_token']
+    spotifyApi.setAccessToken(access_token)
+    redisClient.set('access_token', access_token, redis.print)
+    return access_token
+  } catch (err) {
+    throw new Error('refreshToken: error setting refresh token')
+  }
+}
+
+const getSpotifyTokens = async () => {
+  const access_token = await getAsync('access_token')
+  const refresh_token = await getAsync('refresh_token')
+  if (!access_token || !refresh_token) {
+    throw new Error(
+      `Spotify tokens not set access_token=${access_token}, refresh_token=${refresh_token}`
+    )
+  }
+  return {
+    access_token,
+    refresh_token,
+  }
+}
+
+const getRedisSong = async (): Promise<Song | null> => {
+  const redis_song_str = await getAsync('last_song')
+  if (!redis_song_str) return null
 
   const redis_song = JSON.parse(redis_song_str)
 
-  if (
-    redis_song &&
-    redis_song.expire_at &&
-    new Date(redis_song.expire_at) > new Date()
-  ) {
-    return res.status(200).json(redis_song)
+  const isPlaying =
+    redis_song.expire_at && new Date(redis_song.expire_at) > new Date()
+
+  return {
+    ...redis_song,
+    isPlaying,
   }
+}
 
-  spotifyApi.setAccessToken(access_token)
-  spotifyApi.setRefreshToken(refresh_token)
+export const getCurrentSong = async () => {
+  const { access_token, refresh_token } = await getSpotifyTokens()
 
-  const refreshToken = async () => {
-    try {
-      const data = await spotifyApi.refreshAccessToken()
-      access_token = data.body['access_token']
-      spotifyApi.setAccessToken(access_token)
-      redisClient.set('access_token', access_token, redis.print)
-    } catch (err) {
-      throw new Error('refreshToken: error setting refresh token')
-    }
+  const redis_song = await getRedisSong()
+  if (redis_song?.isPlaying) {
+    return redis_song
   }
 
   try {
-    res.setHeader('Content-Type', 'application/json')
+    spotifyApi.setAccessToken(access_token)
+    spotifyApi.setRefreshToken(refresh_token)
+
     const data = await getData(access_token)
-    if (data === null) {
-      redis_song.isPlaying = false
-      return res.status(200).json(redis_song)
+
+    if (data != null) {
+      return data
     }
-    return res.status(200).json(data)
-  } catch (err) {
-    try {
-      await refreshToken()
-      const data = await getData(access_token)
-      if (data === null) {
-        redis_song.isPlaying = false
-        return res.status(200).json(redis_song)
-      }
-      return res.status(200).json(data)
-    } catch (err) {
-      res.status(500).json({ error: err.message })
+    if (redis_song) {
+      return redis_song
     }
+    throw new Error('Cached song not found')
+  } catch (e) {
+    const access_token_new = await refreshToken()
+    const data = await getData(access_token_new)
+
+    if (data != null) {
+      return data
+    }
+    return redis_song
+  }
+}
+
+export default async (_req: NextApiRequest, res: NextApiResponse) => {
+  res.setHeader('Content-Type', 'application/json')
+  try {
+    const song = await getCurrentSong()
+    if (!song) {
+      throw new Error('Cached song not found')
+    }
+    return res.status(200).json(song)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
   }
 }

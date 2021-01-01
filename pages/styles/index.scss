@@ -4,16 +4,21 @@ $spacingMd: 8px;
 $spacingLg: 12px;
 
 body {
-  font-family: Sans-Serif;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    Helvetica Neue, Arial, Noto Sans, sans-serif, Apple Color Emoji,
+    Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
   margin: 0;
 }
 
 .background {
-  z-index: 0;
+  z-index: -1;
   position: absolute;
   top: 0;
   width: 100vw;
   min-height: 100vh;
+  opacity: 0.4;
   background-repeat: repeat;
   background: rgba(0, 0, 0, 0) url('/white_carbon.png');
   transition: background-color 1s;
@@ -28,6 +33,10 @@ body {
   left: 0;
   background-color: inherit;
   content: ' ';
+}
+
+.github-corner {
+  z-index: 1;
 }
 
 .container {
@@ -85,13 +94,6 @@ body {
   font-size: 16px;
 }
 
-.title {
-  z-index: 1;
-  font-size: 26px;
-  margin-bottom: 2 * $spacingLg;
-  display: flex;
-}
-
 .progress-container {
   margin-top: 2 * $spacingLg;
   width: 100%;
@@ -111,45 +113,13 @@ body {
   justify-content: space-between;
 }
 
-.live {
-  background: black;
-  border-radius: 50%;
-  margin: 2px;
-  margin-right: $spacingMd;
-  height: 20px;
-  width: 20px;
-
-  background: rgba(29, 185, 84, 1);
-  box-shadow: 0 0 0 0 rgba(29, 185, 84, 1);
-  transform: scale(1);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(29, 185, 84, 0.7);
-  }
-
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 10px rgba(29, 185, 84, 0);
-  }
-
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(29, 185, 84, 0);
-  }
-}
-
-.heading {
-  display: none;
-}
-
 .footer {
   position: absolute;
   z-index: 1;
   bottom: 2 * $spacingLg;
+  font-size: 1.2em;
+  font-weight: 400;
+  margin: 10vmin 0 0;
 }
 
 .login {

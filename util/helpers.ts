@@ -1,15 +1,5 @@
 import memoize from 'lodash.memoize'
 
-export const hexToRgba = memoize((hex: string) => {
-  if (!hex) return '#FFF'
-
-  const bigint = parseInt(hex, 16)
-  const r = (bigint >> 16) & 255
-  const g = (bigint >> 8) & 255
-  const b = bigint & 255
-  return `rgb(${r}, ${g}, ${b}, 0.2)`
-})
-
 export const idToColor = memoize((id) => {
   let hash = 0
   if (id.length === 0) return '#FFF'

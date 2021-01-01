@@ -3,6 +3,7 @@ import { NextPageContext } from 'next'
 import Head from 'next/head'
 import fetch from 'isomorphic-unfetch'
 import ReactGA from 'react-ga'
+import GithubCorner from 'react-github-corner'
 
 import Footer from './components/Footer'
 import Error from './components/Error'
@@ -10,29 +11,25 @@ import Loading from './components/Loading'
 import Progress from './components/Progress'
 
 import { useInterval } from '../util/hooks'
-import { hexToRgba, idToColor } from '../util/helpers'
+import { Song } from '../typings/song'
 
 type Props = {
-  song: any // @TODO
+  song: Song
   isError: boolean
   progressMs: number
+  gaCode: string
 }
 
 const Home = (props: Props) => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [isError, setIsError] = React.useState(props.isError)
-
   const [song, setSong] = React.useState(props.song)
   const [progressMs, setProgressMs] = React.useState(props.progressMs)
   const [progress, setProgress] = React.useState(0)
 
   React.useEffect(() => {
-    try {
-      ReactGA.initialize(process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_CODE || '')
-    } catch (err) {
-      // @TODO
-    }
-  }, [])
+    ReactGA.initialize(props.gaCode)
+  }, [props.gaCode])
 
   const getPlayingSong = async () => {
     if (isLoading) return null
@@ -55,7 +52,7 @@ const Home = (props: Props) => {
   }
 
   useInterval(() => {
-    if (song && song.isPlaying && progressMs < song.duration_ms) {
+    if (song?.isPlaying && progressMs < song.duration_ms) {
       setProgressMs(progressMs + 100)
     }
   }, 100)
@@ -92,14 +89,14 @@ const Home = (props: Props) => {
   return (
     <>
       <Head>
-        <title>What is Raed playing</title>
+        <title>🎧 Playing on Spotify</title>
       </Head>
+      <GithubCorner
+        className="github-corner"
+        size={120}
+        href="https://github.com/RaedsLab/islistening"
+      />
       <div className="container">
-        <h1 className="heading">I'm listening to</h1>
-        <div className="title">
-          {song.isPlaying && <div className="live" />}
-          I'm listening to
-        </div>
         <div className="image-container">
           <a href={song.url} target="_blank" rel="noopener">
             <img className="image" src={song.image} alt="cover" />
@@ -121,33 +118,33 @@ const Home = (props: Props) => {
       <div
         className="background"
         style={{
-          backgroundColor:
-            hexToRgba(song.backgroundColor) || idToColor(song.id),
+          backgroundColor: song.backgroundColor,
         }}
-      ></div>
+      />
     </>
   )
 }
 
 Home.getInitialProps = async ({ req }: NextPageContext) => {
   try {
-    const protocol = req ? req.headers['x-forwarded-proto'] || 'http' : 'http'
-    const baseUrl = req ? `${protocol}://${req.headers.host}` : ''
-    const res = await fetch(baseUrl + '/api/get-spotify-current')
-    const data = await res.json()
+    const gaCode = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_CODE
 
-    if (data.isPlaying) {
-      const time_diff =
-        new Date().getTime() - new Date(data.timestamp).getTime()
-      return {
-        song: data,
-        progressMs: time_diff + data.progress_ms,
-      }
-    }
+    const protocol = req?.headers['x-forwarded-proto'] || 'http'
+    const baseUrl = req ? `${protocol}://${req.headers.host}` : ''
+    const song = await fetch(baseUrl + '/api/get-spotify-current')
+      .then((res) => res.json())
+      .then((data) => {
+        return {
+          ...data,
+          expire_at: new Date(data.expire_at),
+        } as Song
+      })
+    const time_diff = new Date().getTime() - new Date(song.timestamp).getTime()
 
     return {
-      song: data,
-      progressMs: 0,
+      gaCode,
+      song,
+      progressMs: song.isPlaying ? time_diff + song.progress_ms : 0,
     }
   } catch (err) {
     return { isLoading: false, isError: true }
