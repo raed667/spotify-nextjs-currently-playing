@@ -1,9 +1,18 @@
-# Currently Listening on Spotify
+# 🎧 Currently Listening on Spotify
 
-[Demo](https://spotify.raed.dev/)
+## Check it out [spotify.raed.dev](https://spotify.raed.dev/)
 
-> Now Playing App using Next.js + Spotify
+![screenshot](https://i.imgur.com/eYCFVr1.png)
 
+> A small Next.js application to show the world what you're currently playing on Spotify 🎶
+
+It also exposes an SVG image to be embedded in your Github [README](https://github.com/RaedsLab) like this:
+
+<b>🎧 I'm currently listening to</b>
+
+<p>
+<a href="https://spotify.raed.dev/" target="_blank"><img height="180em" src="https://spotify.raed.dev/api/get-spotify-current-svg?v2" /></a>
+</p>
 
 ## Build Setup
 
@@ -15,9 +24,9 @@ $ yarn && yarn dev
 $ yarn && yarn build && yarn start
 ```
 
-Inspired by [cherscarlett/cherislistening](https://github.com/cherscarlett/cherislistening)
-
 Project build using [Next.js](https://nextjs.org/), [Spotify Web API ](https://developer.spotify.com/documentation/web-api/)and [Redis](https://redislabs.com).
+
+Inspired by [cherscarlett/cherislistening](https://github.com/cherscarlett/cherislistening)
 
 # License
 

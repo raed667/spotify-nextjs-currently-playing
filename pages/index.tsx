@@ -94,7 +94,7 @@ const Home = (props: Props) => {
       <GithubCorner
         className="github-corner"
         size={120}
-        href="https://github.com/RaedsLab/islistening"
+        href="https://github.com/RaedsLab/spotify-nextjs-currently-playing"
       />
       <div className="container">
         <div className="image-container">
