@@ -1,28 +1,17 @@
-import { useState, useEffect, useRef } from 'react'
+import React from 'react'
 
 export const useInterval = (callback: Function, delay: number) => {
-  const savedCallback = useRef<Function>()
+  const savedCallback = React.useRef<Function>()
 
-  useEffect(() => {
+  React.useEffect(() => {
     savedCallback.current = callback
   }, [callback])
 
-  useEffect(() => {
+  React.useEffect(() => {
     const tick = () => savedCallback.current && savedCallback.current()
     if (delay !== null) {
       const id = setInterval(tick, delay)
       return () => clearInterval(id)
     }
   }, [delay])
-}
-
-export const useDebounce = (value: any, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value)
-
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay)
-    return () => clearTimeout(handler)
-  }, [value, delay])
-
-  return debouncedValue
 }

@@ -20,6 +20,16 @@ type Props = {
   gaCode: string
 }
 
+const getInitialProgress = (
+  timestamp: number,
+  progress_ms: number,
+  isPlaying: boolean
+) => {
+  if (!isPlaying) return 0
+  const time_diff = new Date().getTime() - new Date(timestamp).getTime()
+  return time_diff + progress_ms
+}
+
 const Home = (props: Props) => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [isError, setIsError] = React.useState(props.isError)
@@ -31,19 +41,34 @@ const Home = (props: Props) => {
     ReactGA.initialize(props.gaCode)
   }, [props.gaCode])
 
-  const getPlayingSong = async () => {
-    if (isLoading) return null
+  const getPlayingSong = async (): Promise<
+    | {
+        error: boolean
+        song?: Song
+        progressMs?: number
+      }
+    | undefined
+  > => {
+    if (isLoading) return undefined
     try {
-      const res = await fetch('/api/get-spotify-current')
-      const data = await res.json()
+      const data = await fetch('/api/get-spotify-current')
+        .then((res) => res.json())
+        .then((data) => {
+          return {
+            ...data,
+            //    expire_at: new Date(data.expire_at),
+          } as Song
+        })
 
       if (data.isPlaying) {
-        const time_diff =
-          new Date().getTime() - new Date(data.timestamp).getTime()
         return {
           error: false,
           song: data,
-          progressMs: time_diff + data.progress_ms,
+          progressMs: getInitialProgress(
+            data.timestamp,
+            data.progress_ms,
+            data.isPlaying
+          ),
         }
       }
     } catch (err) {
@@ -52,14 +77,17 @@ const Home = (props: Props) => {
   }
 
   useInterval(() => {
-    if (song?.isPlaying && progressMs < song.duration_ms) {
-      setProgressMs(progressMs + 100)
+    if (!song || !song.isPlaying) return
+
+    // const expireAt = new Date(song.expire_at)
+    if (progressMs < song.duration_ms) {
+      setProgressMs(progressMs + 1000)
     }
-  }, 100)
+  }, 1000)
 
   React.useEffect(() => {
     if (song) {
-      setProgress((100 * progressMs) / song.duration_ms)
+      setProgress(Math.ceil((100 * progressMs) / song.duration_ms))
     }
   }, [song, progressMs])
 
@@ -70,21 +98,16 @@ const Home = (props: Props) => {
       getPlayingSong().then((data) => {
         if (data) {
           setIsError(data.error)
-          setSong(data.song)
-          setProgressMs(data.progressMs)
+          data.song && setSong(data.song)
+          setProgressMs(data.progressMs || 0)
         }
         setIsLoading(false)
       })
     }
   }, [progress])
 
-  if (isError) {
-    return <Error />
-  }
-
-  if (!song) {
-    return <Loading />
-  }
+  if (isError) return <Error />
+  if (!song) return <Loading />
 
   return (
     <>
@@ -136,15 +159,18 @@ Home.getInitialProps = async ({ req }: NextPageContext) => {
       .then((data) => {
         return {
           ...data,
-          expire_at: new Date(data.expire_at),
+          //    expire_at: new Date(data.expire_at),
         } as Song
       })
-    const time_diff = new Date().getTime() - new Date(song.timestamp).getTime()
 
     return {
       gaCode,
       song,
-      progressMs: song.isPlaying ? time_diff + song.progress_ms : 0,
+      progressMs: getInitialProgress(
+        song.timestamp,
+        song.progress_ms,
+        song.isPlaying
+      ),
     }
   } catch (err) {
     return { isLoading: false, isError: true }

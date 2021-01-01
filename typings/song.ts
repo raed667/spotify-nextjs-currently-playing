@@ -29,7 +29,7 @@ export type Song = {
   preview_url: string
   artist: string
   image: string
-  expire_at: Date
+  expire_at: Date | string
   timestamp: number
   backgroundColor: string
   isPlaying: boolean
