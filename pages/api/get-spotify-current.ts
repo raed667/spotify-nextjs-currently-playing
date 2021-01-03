@@ -30,9 +30,10 @@ const redisClient = redis.createClient({
 })
 const getAsync = promisify(redisClient.get).bind(redisClient)
 
-const extract = (raw: RawSong): Song => {
+const extract = (raw: RawSong): Song | null => {
   if (raw.currently_playing_type !== 'track') {
-    throw new Error('Not playing')
+    console.error('ERROR: playing type not supported', raw)
+    return null
   }
   return { ...extractSong(raw), isPlaying: true }
 }
@@ -78,6 +79,9 @@ const getData = async (access_token: string): Promise<Song | null> => {
   if (response.status === 200) {
     const data = await response.json()
     const song = extract(data)
+    if (song === null) {
+      return null
+    }
 
     try {
       const palette = await Vibrant.from(song.image).getPalette()
