@@ -2,8 +2,6 @@
 
 ## Check it out [spotify.raed.dev](https://spotify.raed.dev/)
 
-![screenshot](https://i.imgur.com/eYCFVr1.png)
-
 > A small Next.js application to show the world what you're currently playing on Spotify 🎶
 
 It also exposes an SVG image to be embedded in your Github [README](https://github.com/RaedsLab) like this:
