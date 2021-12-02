@@ -5,7 +5,7 @@ const Error = () => (
     <div className="laoding">
       <h1>Sorry</h1>
       I'm not currently listening to music, come back a bit later or visit my{' '}
-      <a href="https://github.com/RaedsLab">Github</a>.
+      <a href="https://github.com/Raed667">Github</a>.
     </div>
   </div>
 )
