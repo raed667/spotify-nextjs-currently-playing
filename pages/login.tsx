@@ -14,27 +14,27 @@ const Login = () => {
     error: null,
   })
 
-  const getSpotifyLoginURL = async () => {
-    setState({ ...state, error: null, loading: true })
+  const getSpotifyLoginURL = React.useCallback(async () => {
+    setState((s) => ({ ...s, error: null, loading: true }))
 
     const url = await fetch('/api/get-spotify-login-url')
       .then((response) => response.json())
       .then((json) => json.spotify_uri)
 
-    setState({ ...state, error: null, loading: false })
+    setState((s) => ({ ...s, error: null, loading: false }))
 
     return url
-  }
+  }, [])
 
   React.useEffect(() => {
     getSpotifyLoginURL()
       .then((loginUrl) => {
-        setState({ ...state, loginUrl })
+        setState((s) => ({ ...s, loginUrl }))
       })
       .catch((error) => {
-        setState({ ...state, error })
+        setState((s) => ({ ...s, error }))
       })
-  }, [])
+  }, [getSpotifyLoginURL])
 
   // Error
   if (state.error) {
@@ -52,8 +52,8 @@ const Login = () => {
       {state.loading ? (
         <p>Loading...</p>
       ) : (
-        <Link href={state.loginUrl}>
-          <a className="loginLink">LOG IN</a>
+        <Link href={state.loginUrl} className="loginLink">
+          LOG IN
         </Link>
       )}
     </div>

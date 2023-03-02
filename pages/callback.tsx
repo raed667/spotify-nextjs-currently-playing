@@ -1,4 +1,5 @@
 import React from 'react'
+import { redirect } from 'next/navigation'
 
 const saveSpotifyCode = (code: string) => {
   return fetch('/api/save-spotify-code', {
@@ -28,10 +29,14 @@ const Callback = () => {
       setState({ loading: false, error: 'Can not find code in response' })
     } else {
       saveSpotifyCode(code)
-        .then(() => setState({ loading: false, error: null }))
-        .catch(err => setState({ loading: false, error: err }))
+        .then(() => {
+          setState({ loading: false, error: null })
+        })
+        .catch((err) => setState({ loading: false, error: err }))
     }
   }, [])
+
+  console.log({ state })
 
   // Error
   if (state.error) {

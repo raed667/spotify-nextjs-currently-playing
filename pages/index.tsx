@@ -2,7 +2,6 @@ import React from 'react'
 import { NextPageContext } from 'next'
 import Head from 'next/head'
 import fetch from 'isomorphic-unfetch'
-import ReactGA from 'react-ga'
 import GithubCorner from 'react-github-corner'
 
 import Footer from './components/Footer'
@@ -17,7 +16,6 @@ type Props = {
   song: Song
   isError: boolean
   progressMs: number
-  gaCode: string
 }
 
 const getInitialProgress = (
@@ -37,11 +35,7 @@ const Home = (props: Props) => {
   const [progressMs, setProgressMs] = React.useState(props.progressMs)
   const [progress, setProgress] = React.useState(0)
 
-  React.useEffect(() => {
-    ReactGA.initialize(props.gaCode)
-  }, [props.gaCode])
-
-  const getPlayingSong = async (): Promise<
+  const getPlayingSong = React.useCallback(async (): Promise<
     | {
         error: boolean
         song?: Song
@@ -49,7 +43,6 @@ const Home = (props: Props) => {
       }
     | undefined
   > => {
-    if (isLoading) return undefined
     try {
       const data = await fetch('/api/get-spotify-current')
         .then((res) => res.json())
@@ -74,7 +67,7 @@ const Home = (props: Props) => {
     } catch (err) {
       return { error: true }
     }
-  }
+  }, [])
 
   useInterval(() => {
     if (!song || !song.isPlaying) return
@@ -95,6 +88,8 @@ const Home = (props: Props) => {
     if (progress >= 100) {
       setIsError(false)
       setIsLoading(true)
+      if (isLoading) return
+
       getPlayingSong().then((data) => {
         if (data) {
           setIsError(data.error)
@@ -104,7 +99,7 @@ const Home = (props: Props) => {
         setIsLoading(false)
       })
     }
-  }, [progress])
+  }, [getPlayingSong, progress, isLoading])
 
   if (isError) return <Error />
   if (!song) return <Loading />
@@ -150,8 +145,6 @@ const Home = (props: Props) => {
 
 Home.getInitialProps = async ({ req }: NextPageContext) => {
   try {
-    const gaCode = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_CODE
-
     const protocol = req?.headers['x-forwarded-proto'] || 'http'
     const baseUrl = req ? `${protocol}://${req.headers.host}` : ''
     const song = await fetch(baseUrl + '/api/get-spotify-current')
@@ -164,7 +157,6 @@ Home.getInitialProps = async ({ req }: NextPageContext) => {
       })
 
     return {
-      gaCode,
       song,
       progressMs: getInitialProgress(
         song.timestamp,
