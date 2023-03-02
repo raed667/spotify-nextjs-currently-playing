@@ -72,9 +72,10 @@ const Home = (props: Props) => {
   useInterval(() => {
     if (!song || !song.isPlaying) return
 
-    // const expireAt = new Date(song.expire_at)
     if (progressMs < song.duration_ms) {
-      setProgressMs(progressMs + 1000)
+      setProgressMs(
+        getInitialProgress(song.timestamp, song.progress_ms, song.isPlaying)
+      )
     }
   }, 1000)
 
