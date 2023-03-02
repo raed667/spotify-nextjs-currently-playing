@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import SpotifyWebApi from 'spotify-web-api-node'
-import redis from 'redis'
-import { promisify } from 'util'
+import { createClient } from 'redis'
 import fetch from 'node-fetch'
 import Vibrant from 'node-vibrant'
 
@@ -23,12 +22,10 @@ const spotifyApi = new SpotifyWebApi({
   redirectUri: REDIRECT_URI,
 })
 
-const redisClient = redis.createClient({
-  port: Number(REDIS_PORT),
-  host: REDIS_HOST,
+const redisClient = createClient({
+  url: `redis://${REDIS_HOST}:${REDIS_PORT}`,
   password: REDIS_PASSWORD,
 })
-const getAsync = promisify(redisClient.get).bind(redisClient)
 
 const extract = (raw: RawSong): Song | null => {
   if (raw.currently_playing_type !== 'track') {
@@ -90,7 +87,7 @@ const getData = async (access_token: string): Promise<Song | null> => {
       song.backgroundColor = idToColor(song.id)
     }
 
-    redisClient.set('last_song', JSON.stringify(song), redis.print)
+    redisClient.set('last_song', JSON.stringify(song))
     return song
   }
 
@@ -102,7 +99,7 @@ const refreshToken = async () => {
     const data = await spotifyApi.refreshAccessToken()
     const access_token = data.body['access_token']
     spotifyApi.setAccessToken(access_token)
-    redisClient.set('access_token', access_token, redis.print)
+    redisClient.set('access_token', access_token)
     return access_token
   } catch (err) {
     throw new Error('refreshToken: error setting refresh token')
@@ -110,8 +107,8 @@ const refreshToken = async () => {
 }
 
 const getSpotifyTokens = async () => {
-  const access_token = await getAsync('access_token')
-  const refresh_token = await getAsync('refresh_token')
+  const access_token = await redisClient.get('access_token')
+  const refresh_token = await redisClient.get('refresh_token')
   if (!access_token || !refresh_token) {
     throw new Error(
       `Spotify tokens not set access_token=${access_token}, refresh_token=${refresh_token}`
@@ -124,7 +121,7 @@ const getSpotifyTokens = async () => {
 }
 
 const getRedisSong = async (): Promise<Song | null> => {
-  const redis_song_str = await getAsync('last_song')
+  const redis_song_str = await redisClient.get('last_song')
   if (!redis_song_str) return null
 
   const redis_song = JSON.parse(redis_song_str)
@@ -173,12 +170,16 @@ export const getCurrentSong = async () => {
 export default async (_req: NextApiRequest, res: NextApiResponse) => {
   res.setHeader('Content-Type', 'application/json')
   try {
+    if (!redisClient.isOpen) {
+      await redisClient.connect()
+    }
     const song = await getCurrentSong()
     if (!song) {
       throw new Error('Cached song not found')
     }
     return res.status(200).json(song)
   } catch (error) {
+    // @ts-expect-error
     res.status(500).json({ error: error.message })
   }
 }

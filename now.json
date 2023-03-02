@@ -6,7 +6,6 @@
         "REDIRECT_URI": "@redirect_uri",
         "REDIS_PORT": "@redis_port",
         "REDIS_HOST": "@redis_host",
-        "REDIS_PASSWORD": "@redis_password",
-        "NEXT_PUBLIC_GOOGLE_ANALYTICS_CODE": "@next_public_google_analytics_code"
+        "REDIS_PASSWORD": "@redis_password"
     }
 }

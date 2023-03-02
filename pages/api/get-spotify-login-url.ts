@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import querystring from 'querystring'
 
-const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = process.env
+const { CLIENT_ID, REDIRECT_URI } = process.env
 
 const scopes = [
   'user-read-email',

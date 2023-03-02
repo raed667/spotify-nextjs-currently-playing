@@ -5,41 +5,37 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "isomorphic-unfetch": "^3.0.0",
     "lodash.memoize": "^4.1.2",
-    "next": "9.3.4",
-    "next-offline": "^5.0.0",
+    "next": "^13.2.3",
     "node-fetch": "^2.6.1",
-    "node-vibrant": "^3.1.5",
-    "querystring": "^0.2.0",
-    "react": "16.13.1",
-    "react-dom": "16.13.1",
-    "react-ga": "^2.7.0",
+    "node-vibrant": "^3.2.1-alpha.1",
+    "querystring": "^0.2.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-github-corner": "^2.5.0",
-    "redis": "^3.0.2",
+    "redis": "^4.6.5",
     "spotify-web-api-node": "^4.0.0"
   },
   "devDependencies": {
-    "@types/lodash.memoize": "^4.1.6",
-    "@types/node": "^13.11.0",
-    "@types/node-fetch": "^2.5.5",
-    "@types/react": "^16.9.32",
-    "@types/redis": "^2.8.17",
+    "@types/lodash.memoize": "^4.1.7",
+    "@types/node": "^18.14.4",
+    "@types/node-fetch": "^2.6.2",
+    "@types/react": "^18.0.28",
+    "@types/redis": "^4.0.11",
     "@types/spotify-web-api-node": "^4.0.1",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb": "^18.0.1",
-    "eslint-plugin-import": "^2.19.1",
-    "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-react": "^7.17.0",
-    "eslint-plugin-react-hooks": "^3.0.0",
-    "prettier": "2.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "eslint": "^8.35.0",
+    "eslint-config-next": "^13.2.3",
+    "prettier": "2.8.4",
     "sass": "^1.58.3",
-    "typescript": "^3.8.3"
+    "typescript": "*"
   },
   "engines": {
-    "node": "14.x"
+    "node": "18.x"
   }
 }

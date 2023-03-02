@@ -4,6 +4,8 @@ type Props = {
   Component: React.ElementType
   pageProps: any
 }
-export default ({ Component, pageProps }: Props) => {
+const App = ({ Component, pageProps }: Props) => {
   return <Component {...pageProps} />
 }
+
+export default App

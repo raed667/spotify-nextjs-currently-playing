@@ -141,8 +141,8 @@ export default async (_req: NextApiRequest, res: NextApiResponse) => {
     res.setHeader('Content-Type', 'image/svg+xml')
     return res.status(200).send(svg)
   } catch (error) {
-    console.log(error)
     res.setHeader('Content-Type', 'application/json')
+    // @ts-expect-error
     res.status(500).json({ error: error.message })
   }
 }
