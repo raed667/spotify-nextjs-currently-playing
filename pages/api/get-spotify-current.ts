@@ -136,6 +136,10 @@ const getRedisSong = async (): Promise<Song | null> => {
 }
 
 export const getCurrentSong = async () => {
+  if (!redisClient.isOpen) {
+    await redisClient.connect()
+  }
+
   const { access_token, refresh_token } = await getSpotifyTokens()
 
   const redis_song = await getRedisSong()
@@ -170,9 +174,6 @@ export const getCurrentSong = async () => {
 export default async (_req: NextApiRequest, res: NextApiResponse) => {
   res.setHeader('Content-Type', 'application/json')
   try {
-    if (!redisClient.isOpen) {
-      await redisClient.connect()
-    }
     const song = await getCurrentSong()
     if (!song) {
       throw new Error('Cached song not found')
