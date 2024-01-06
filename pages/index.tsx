@@ -37,10 +37,10 @@ const Home = (props: Props) => {
 
   const getPlayingSong = React.useCallback(async (): Promise<
     | {
-        error: boolean
-        song?: Song
-        progressMs?: number
-      }
+      error: boolean
+      song?: Song
+      progressMs?: number
+    }
     | undefined
   > => {
     try {
@@ -108,6 +108,10 @@ const Home = (props: Props) => {
   return (
     <>
       <Head>
+        <meta
+          name="viewport"
+          content="initial-scale=1.0, width=device-width"
+        />
         <title>🎧 Playing on Spotify</title>
       </Head>
       <GithubCorner

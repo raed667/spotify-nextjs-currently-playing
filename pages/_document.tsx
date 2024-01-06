@@ -15,10 +15,6 @@ class MyDocument extends Document {
             name="Description"
             content="Show what music Raed is listening to on Spotify."
           />
-          <meta
-            name="viewport"
-            content="initial-scale=1.0, width=device-width"
-          />
         </Head>
         <body>
           <Main />

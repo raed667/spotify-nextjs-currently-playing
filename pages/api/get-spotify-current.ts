@@ -74,7 +74,7 @@ const getData = async (access_token: string): Promise<Song | null> => {
     throw new Error('Something went wrong status=' + response.status)
   }
   if (response.status === 200) {
-    const data = await response.json()
+    const data = await response.json() as RawSong
     const song = extract(data)
     if (song === null) {
       return null
