@@ -1,16 +1,14 @@
-# 🎧 Currently Listening on Spotify
+> [!IMPORTANT]
+> Project archived because I don't use Spotify anymore. https://blog.raed.dev/posts/goodbye_spotify
 
-## Check it out [spotify.raed.dev](https://spotify.raed.dev/)
+
+# 🎧 Currently Listening on Spotify
 
 > A small Next.js application to show the world what you're currently playing on Spotify 🎶
 
 It also exposes an SVG image to be embedded in your Github [README](https://github.com/Raed667) like this:
 
 <b>🎧 I'm currently listening to</b>
-
-<p>
-<a href="https://spotify.raed.dev/" target="_blank"><img height="180em" src="https://spotify.raed.dev/api/get-spotify-current-svg?v2" /></a>
-</p>
 
 ## Build Setup
 
